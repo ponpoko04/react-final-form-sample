@@ -3,6 +3,12 @@ import { Form, Field } from 'react-final-form'
 import Styles from './styles'
 import { onSubmit } from '@/components/utils'
 
+type Error = {
+  username?: string,
+  password?: string,
+  confirm?: string,
+}
+
 export default function Home() {
   return (
     <Styles>
@@ -18,11 +24,7 @@ export default function Home() {
       <Form
         onSubmit={onSubmit}
         validate={values => {
-          const errors = {
-            username: '',
-            password: '',
-            confirm: '',
-          }
+          const errors: Error = {}
           if (!values.username) {
             errors.username = 'Required'
           }
@@ -34,14 +36,16 @@ export default function Home() {
           } else if (values.confirm !== values.password) {
             errors.confirm = 'Must match'
           }
-
-          console.log(errors);
-          if (errors.username === '' && errors.password === '' && errors.confirm === '') {
-            return undefined
-          }
-          return errors
+          // console.log('errors', errors);
+          // return errors
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              console.log('promise', errors);
+              resolve(errors);
+            }, 5000);
+          });
         }}
-        render={({ handleSubmit, form, submitting, pristine, values }) => (
+        render={({ handleSubmit, form, submitting, pristine, values, validating }) => (
           <form onSubmit={handleSubmit}>
             <Field name="username">
               {({ input, meta }) => (
@@ -71,7 +75,7 @@ export default function Home() {
               )}
             </Field>
             <div className="buttons">
-              <button type="submit" disabled={submitting}>
+              <button type="submit" disabled={submitting || validating}>
                 Submit
               </button>
               <button
